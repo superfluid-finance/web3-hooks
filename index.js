@@ -36,7 +36,8 @@ const NGROK_AUTH_TOKEN = process.env.NGROK_AUTH_TOKEN;
   app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
   });
-
-  const ngrokUrl = await ngrok.connect({port: PORT, authtoken: NGROK_AUTH_TOKEN});
-  console.log(`ngrok tunnel created: ${ngrokUrl}`);
+  if (process.env.NODE_ENV === 'local_development') {
+    const ngrokUrl = await ngrok.connect({port: PORT, authtoken: NGROK_AUTH_TOKEN});
+    console.log(`ngrok tunnel created: ${ngrokUrl}`);
+  }
 })();

@@ -22,7 +22,9 @@ Web3 Hooks is a Node.js server that listens for incoming webhooks, parses the re
 5. Start the server:
 ```yarn start``` or ```npm start```
 
-The server will listen for incoming webhook requests on the specified port (default: 3000). The ngrok tunnel will also be created, and its public URL will be logged in the console.
+If you want to use ngrok to create a public URL for your local server, you can add `NODE_ENV=local_development` to your `.env`
+
+The server will listen for incoming webhook requests on the specified port (default: 3000). If you are using ngrok, you can use the generated URL to send webhook requests to your local server.
 
 ## License
 MIT License
