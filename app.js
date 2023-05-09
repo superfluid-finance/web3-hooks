@@ -6,6 +6,7 @@ const ngrok = require('ngrok');
 const GraphQLClient = require('./graphqlClient');
 const EventFetcher = require('./eventFetcher');
 const { SlackWebhook, SlackMessageBuilder } = require('./slackIntegration');
+const metrics = require('./metrics');
 
 
 const app = express();
@@ -34,6 +35,11 @@ app.post('/tokendowngrade', async (req, res) => {
     processWebhook(req, res, eventFetcher.tokenDowngradedEvents.bind(eventFetcher), 'downgrade');
 });
 
+app.get('/metrics', async (req, res) => {
+    res.set('Content-Type', metrics.register.contentType);
+    res.end(await metrics.getMetrics());
+});
+
 async function processWebhook(req, res, eventFunction, eventType) {
     try {
         const parsedData = req.body;
@@ -42,7 +48,7 @@ async function processWebhook(req, res, eventFunction, eventType) {
         if(tokenAddress) {
             const data = (await eventFunction(tokenAddress, minAmount, blockNumber)).map(
                 (element) => { return slackFormatter.formatTokenEvent(element, eventType);
-                });
+            });
 
             for(const msg of data) {
                 await slackWebhook.sendMessage(JSON.stringify(msg));
@@ -51,9 +57,11 @@ async function processWebhook(req, res, eventFunction, eventType) {
         } else {
             console.error("Token Address not found", JSON.stringify(parsedData, null, 2));
         }
+        metrics.handleSuccessfulWebhook(eventType);
         res.status(200).send();
     } catch (error) {
         console.error('Error processing webhook:', error);
+        metrics.handleFailedWebhook();
         res.status(500).send('Error processing webhook');
     }
 }
