@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const ngrok = require('ngrok');
 const GraphQLClient = require('./graphqlClient');
 const EventFetcher = require('./eventFetcher');
-const { SlackWebhook, SlackMessageBuilder } = require('./slackIntegration');
+const SlackWebhook = require('./slackWebhook');
 const metrics = require('./metrics');
 
 
@@ -13,7 +13,6 @@ const app = express();
 
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 const slackWebhook = new SlackWebhook(SLACK_WEBHOOK_URL);
-const slackFormatter = new SlackMessageBuilder();
 
 const GRAPHQL_API_URL = 'https://api.thegraph.com/subgraphs/name/superfluid-finance/protocol-v1-matic';
 const graphqlClient = new GraphQLClient(GRAPHQL_API_URL);
@@ -47,11 +46,11 @@ async function processWebhook(req, res, eventFunction, eventType) {
         const blockNumber = parsedData?.event?.data?.block?.number;
         if(tokenAddress) {
             const data = (await eventFunction(tokenAddress, minAmount, blockNumber)).map(
-                (element) => { return slackFormatter.formatTokenEvent(element, eventType);
+                (element) => { return slackWebhook.formatTokenEvent(element, eventType);
             });
 
             for(const msg of data) {
-                await slackWebhook.sendMessage(JSON.stringify(msg));
+                await slackWebhook.sendMessage(msg);
                 console.log(msg);
             }
         } else {
