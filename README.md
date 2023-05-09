@@ -45,7 +45,7 @@ The server uses Alchemy's GraphQL API to fetch token upgrade and downgrade event
 ```
 # Query Example:
 # Polygon Mainnet
-# Get TokenUpgraded from 0x3aD736904E9e65189c3000c7DD2c8AC8bB7cD4e3 USDCx 
+# Get TokenDowngrade from 0x3aD736904E9e65189c3000c7DD2c8AC8bB7cD4e3 USDCx 
 {
   block {
     hash
