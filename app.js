@@ -39,6 +39,8 @@ app.get('/metrics', async (req, res) => {
     res.end(await metrics.getMetrics());
 });
 
+let queue = [];
+
 async function processWebhook(req, res, eventFunction, eventType) {
     try {
         console.log(`Received webhook ${eventType} for block ${req.body?.event?.data?.block?.number}`);
@@ -47,14 +49,12 @@ async function processWebhook(req, res, eventFunction, eventType) {
         const blockNumber = parsedData?.event?.data?.block?.number;
         if(tokenAddress) {
             console.log(`Processing event ${eventType} for token address ${tokenAddress} at block ${blockNumber}`)
-            const data = (await eventFunction(tokenAddress, minAmount, blockNumber)).map(
-                (element) => { return slackWebhook.formatTokenEvent(element, eventType);
+            queue.push({
+                tokenAddress: tokenAddress,
+                eventType: eventType,
+                blockNumber: blockNumber,
+                eventFunction: eventFunction
             });
-
-            for(const msg of data) {
-                await slackWebhook.sendMessage(msg);
-                console.log(msg);
-            }
         }
         metrics.handleSuccessfulWebhook(eventType);
         res.status(200).send();
@@ -64,6 +64,27 @@ async function processWebhook(req, res, eventFunction, eventType) {
         res.status(500).send('Error processing webhook');
     }
 }
+
+// Process the events in the queue
+setImmediate(async function processQueue() {
+    if (queue.length > 0) {
+        const job = queue.shift();
+        try {
+            const data = (await job.eventFunction(job.tokenAddress, minAmount, job.blockNumber)).map(
+                (element) => { return slackWebhook.formatTokenEvent(element, job.eventType);
+                });
+
+            for(const msg of data) {
+                await slackWebhook.sendMessage(msg);
+                console.log(msg);
+            }
+        } catch (error) {
+            console.error('Error processing job:', error);
+        }
+    }
+
+    setImmediate(processQueue);
+});
 
 const PORT = process.env.PORT || 3000;
 const NGROK_AUTH_TOKEN = process.env.NGROK_AUTH_TOKEN;
