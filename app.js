@@ -8,6 +8,8 @@ const EventFetcher = require('./eventFetcher');
 const SlackWebhook = require('./slackWebhook');
 const metrics = require('./metrics');
 
+// When getting an event, delay before query subgraph to allow indexing
+const delay = 1 * 60 * 1000; // 1 minutes
 
 const app = express();
 
@@ -66,7 +68,7 @@ async function processWebhook(req, res, eventFunction, eventType) {
 }
 
 // Process the events in the queue
-setImmediate(async function processQueue() {
+setTimeout(async function processQueue() {
     if (queue.length > 0) {
         const job = queue.shift();
         try {
@@ -83,8 +85,8 @@ setImmediate(async function processQueue() {
         }
     }
 
-    setImmediate(processQueue);
-});
+    setTimeout(processQueue, delay);
+}, delay);
 
 const PORT = process.env.PORT || 3000;
 const NGROK_AUTH_TOKEN = process.env.NGROK_AUTH_TOKEN;
