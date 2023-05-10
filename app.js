@@ -46,6 +46,7 @@ async function processWebhook(req, res, eventFunction, eventType) {
         const tokenAddress = parsedData?.event?.data?.block?.logs?.[0]?.transaction?.to?.address;
         const blockNumber = parsedData?.event?.data?.block?.number;
         if(tokenAddress) {
+            console.log(`Processing event ${eventType} for token address ${tokenAddress} at block ${blockNumber}`)
             const data = (await eventFunction(tokenAddress, minAmount, blockNumber)).map(
                 (element) => { return slackWebhook.formatTokenEvent(element, eventType);
             });
