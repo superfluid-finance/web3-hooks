@@ -41,7 +41,7 @@ app.get('/metrics', async (req, res) => {
 
 async function processWebhook(req, res, eventFunction, eventType) {
     try {
-        console.log(`Received webhook ${eventType}`);
+        console.log(`Received webhook ${eventType} for block ${req.body?.event?.data?.block?.number}`);
         const parsedData = req.body;
         const tokenAddress = parsedData?.event?.data?.block?.logs?.[0]?.transaction?.to?.address;
         const blockNumber = parsedData?.event?.data?.block?.number;
