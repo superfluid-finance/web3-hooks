@@ -53,8 +53,6 @@ async function processWebhook(req, res, eventFunction, eventType) {
                 await slackWebhook.sendMessage(msg);
                 console.log(msg);
             }
-        } else {
-            console.error("Token Address not found", JSON.stringify(parsedData, null, 2));
         }
         metrics.handleSuccessfulWebhook(eventType);
         res.status(200).send();
