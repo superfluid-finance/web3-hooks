@@ -7,6 +7,7 @@ const GraphQLClient = require('./graphqlClient');
 const EventFetcher = require('./eventFetcher');
 const SlackWebhook = require('./slackWebhook');
 const metrics = require('./metrics');
+const sfMetadata = require('@superfluid-finance/metadata');
 
 // When getting an event, delay before query subgraph to allow indexing
 const delay = 1 * 60 * 1000; // 1 minutes
@@ -16,9 +17,15 @@ const app = express();
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 const slackWebhook = new SlackWebhook(SLACK_WEBHOOK_URL);
 
-const GRAPHQL_API_URL = 'https://api.thegraph.com/subgraphs/name/superfluid-finance/protocol-v1-matic';
+// defaulting to polygon-mainnet in order to preserve previous behaviour
+const networkName = process.env.NETWORK || "polygon-mainnet";
+const network = sfMetadata.getNetworkByName(networkName);
+if (network === undefined) {
+    throw("unknown network: ", networkName);
+}
+const GRAPHQL_API_URL = `https://${networkName}.subgraph.x.superfluid.dev`;
 const graphqlClient = new GraphQLClient(GRAPHQL_API_URL);
-const eventFetcher = new EventFetcher(graphqlClient);
+const eventFetcher = new EventFetcher(graphqlClient, network.explorer);
 
 const minAmount = process.env.MIN_AMOUNT || '100000000000000000000';
 

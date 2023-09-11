@@ -5,8 +5,9 @@ const weiToEther = (wei) => {
 };
 
 class EventFetcher {
-    constructor(graphqlClient) {
+    constructor(graphqlClient, explorerUrlBase) {
         this.graphqlClient = graphqlClient;
+        this.explorerUrlBase = explorerUrlBase;
     }
 
     async tokenUpgradedEvents(token, amount, blockNumber) {
@@ -30,9 +31,9 @@ class EventFetcher {
             return {
                 blockNumber: item.blockNumber,
                 date: new Date(item.timestamp * 1000).toUTCString(),
-                transactionHash: `https://polygonscan.com/tx/${item.transactionHash}`,
+                transactionHash: `${this.explorerUrlBase}/tx/${item.transactionHash}`,
                 eventName: item.name,
-                tokenAddress: `https://polygonscan.com/address/${item.token}`,
+                tokenAddress: `${this.explorerUrlBase}/address/${item.token}`,
                 tokenName: tokenData.tokens[0].name,
                 tokenSymbol: tokenData.tokens[0].symbol,
                 amount: item.amount,
