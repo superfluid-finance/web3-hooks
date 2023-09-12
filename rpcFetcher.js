@@ -1,5 +1,7 @@
+#!/usr/bin/env node
+
 /*
-* usage: node rpcFetcher.js <network name> <interface name> <contract name> <event name>
+* usage: rpcFetcher.js <network name> <interface name> <contract name> <event name>
 *   interface name is the name of the Solidity interface or contract
 *   contract name is the key for contract address lookup in metadata network.contractsV1
 *
