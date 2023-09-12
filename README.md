@@ -2,6 +2,21 @@
 
 Web3 Hooks is a Node.js server that listens for incoming webhooks, parses the request data, and forwards the result to various clients such as Slack.
 
+The system is composed of 3 components:
+1. trigger: listens for new events we're interested in and invokes a hook on new events.
+2. hook processor: web server listening for new hook invocations, fetches data we specifically want for that event
+3. notifier: takes the data fetched by the hook processor, formats it in a human readable way and creates a notification out of it, e.g. on Slack
+
+Triggers:
+* [Alchemy Custom Webhook](https://docs.alchemy.com/reference/custom-webhook)
+* bundled script `rpcFetcher.js`, see source for usage instructions
+
+## How to add an event
+
+* Add an Alchemy item or a cronjob invoking rpcFetcher (see inline docs). One trigger per event type and network is needed.
+* eventFetcher.js: add a method `getDataFor<event name>(networkName, event)` which returns an object with all the data wanted in the notification
+* slackWebhook.js: add a method `format<event name>(data, explorerUrlBase)` which returns the string to be sent to Slack
+
 ## Features
 
 - Listen for incoming webhook requests
