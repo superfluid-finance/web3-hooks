@@ -71,7 +71,7 @@ async function processWebhookV2(data, res) {
         const event = data.event;
         const networkName = data.networkName;
         const chainId = data.chainId;
-        console.log(`Received webhook v2 ${event.event} for ${networkName} (${chainId}), block ${event.blockNumber}`);
+        console.log(`Processing webhook v2 ${event.event} for ${networkName} (${chainId}), block ${event.blockNumber}`);
         //console.log(`event: ${JSON.stringify(event, null, 2)}`);
         data.receiveTimestamp = Date.now(); // add a timestamp to allow queue delaying
         queueV2.push(data);
