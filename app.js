@@ -30,7 +30,6 @@ const eventFetcher = new EventFetcher(graphqlClient, networkV1.explorer);
 
 const minAmount = process.env.MIN_AMOUNT || '100000000000000000000';
 
-
 app.use(bodyParser.json());
 app.get('/', async (req, res) => {
     res.status(200).send('GM');
@@ -45,12 +44,13 @@ app.post('/tokenupgrade', async (req, res) => {
 app.post('/tokendowngrade', async (req, res) => {
     processWebhook(req, res, eventFetcher.tokenDowngradedEvents.bind(eventFetcher), 'downgrade');
 });
-/*
-app.post('/v2/appregistered', async (req, res) => {
-    processWebhookV2(req.body, res);
-});
-*/
 
+
+/** V2 
+ * Expected data in body: json object which contains
+ * - "event" (as returned by an RPC node)
+ * - "networkName" (SF canonical name)
+ */
 app.post('/v2/:eventType', async (req, res) => {
     const eventType = req.params.eventType;
     console.log(`Received webhook v2 ${eventType}`);
