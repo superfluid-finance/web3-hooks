@@ -3,6 +3,10 @@
 # updates the remote deployment and restarts the service.
 # operates through ssh, requires you to have access.
 
+echo "!!! WARNING !!!"
+echo "This will commit NOT what you have locally, but what is committed to main AND pushed"
+echo
+
 REMOTE="web3-hooks@main.x.superfluid.dev"
 
 ssh $REMOTE <<EOF
