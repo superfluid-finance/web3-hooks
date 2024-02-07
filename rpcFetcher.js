@@ -7,7 +7,7 @@
 *
 * Intended usage:
 * Periodically invoke via cronjob.
-* 
+*
 * ENV vars:
 * - RPC: RPC URL to use. Defaults to canonical SF RPCs.
 * - BLOCK_HEAD_OFFSET: distance from head block, intended to minimize the change of processing events undone by reorgs. Defaults to 12.
@@ -21,6 +21,8 @@ const fs = require('fs');
 const { ethers } = require('ethers');
 const axios = require("axios");
 const sfAbis = require("@superfluid-finance/ethereum-contracts/build/bundled-abi");
+const extraAbis = require("./extraAbis");
+const allAbis = Object.assign({}, sfAbis, extraAbis);
 const sfMetadata = require('@superfluid-finance/metadata');
 
 const networkName = process.argv[2];
@@ -41,9 +43,9 @@ if (network === undefined) {
     throw("network not in metadata: ", networkName);
 }
 
-const abi = sfAbis[ifaceName];
+const abi = allAbis[ifaceName];
 if (abi === undefined) {
-    throw("interface not in sfAbis: ", ifaceName);
+    throw("interface not in known Abis: ", ifaceName);
 }
 
 const contractAddr = process.env.CONTRACT_ADDRESS || network.contractsV1[contractName];
@@ -107,6 +109,5 @@ async function main() {
         batchStart = batchEnd + 1;
     }
 }
-
 
 main().catch(console.error);
