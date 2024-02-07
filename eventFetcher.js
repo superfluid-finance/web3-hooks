@@ -109,6 +109,29 @@ class EventFetcher {
             date: new Date(sgData.timestamp * 1000).toUTCString(),
         };
     }
+
+    async getDataForVestingScheduleCreated(networkName, event) {
+        const tokenAddr = event.args[0];
+        const query = `{
+            token(id: "${tokenAddr.toLowerCase()}") {
+              id name symbol
+            }
+          }`;
+        const sgData = (await this.queryGraphQL(networkName, query)).token;
+        return {
+            ...this.getGenericData(networkName, event),
+            tokenSymbol: sgData.symbol,
+            tokenAddr: tokenAddr,
+            sender: event.args[1],
+            receiver: event.args[2],
+            date: new Date(sgData.timestamp * 1000).toUTCString(),
+        };
+    }
+
+    async getDataForFlowScheduleCreated(networkName, event) {
+        // we want to exract the same data as for Vesting Schedules, thus just delegate
+        return this.getDataForVestingScheduleCreated(networkName, event);
+    }
 }
 
 module.exports = EventFetcher;

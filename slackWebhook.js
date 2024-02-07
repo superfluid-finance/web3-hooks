@@ -6,6 +6,8 @@ class SlackWebhook {
   }
 
   async sendMessage(text) {
+    if (process.env.DEBUG) console.log(`DEBUG: Sending message to Slack:\n${text}`);
+
     try {
       const message = { text };
       await axios.post(this.webhookUrl, message);
@@ -41,15 +43,28 @@ class SlackWebhook {
 
   formatAppRegistered(data, explorerUrlBase) {
     return `${this.getHeader(data)}
-    App address: <${this.getAddressString(data.app, explorerUrlBase)}>\n
+    App address: ${this.getAddressString(data.app, explorerUrlBase)}\n
     Tx: ${this.getTxString(data.transactionHash, explorerUrlBase)}`;
   }
 
   formatJail(data, explorerUrlBase) {
     return `${this.getHeader(data)}
-    App address: <${this.getAddressString(data.app, explorerUrlBase)}>\n
+    App address: ${this.getAddressString(data.app, explorerUrlBase)}\n
     Reason: ${data.reason}\n
     Tx: ${this.getTxString(data.transactionHash, explorerUrlBase)}`;
+  }
+
+  formatVestingScheduleCreated(data, explorerUrlBase) {
+    return `${this.getHeader(data)}
+    Token: ${data.tokenSymbol} (${this.getAddressString(data.tokenAddr, explorerUrlBase)})\n
+    Sender: ${this.getAddressString(data.sender, explorerUrlBase)}\n
+    Receiver: ${this.getAddressString(data.receiver, explorerUrlBase)}\n
+    Tx: ${this.getTxString(data.transactionHash, explorerUrlBase)}`;
+  }
+
+  formatFlowScheduleCreated(data, explorerUrlBase) {
+    // same format as for Vesting Schedules, thus we just delegate
+    return this.formatVestingScheduleCreated(data, explorerUrlBase);
   }
 }
 

@@ -46,7 +46,7 @@ app.post('/tokendowngrade', async (req, res) => {
 });
 
 
-/** V2 
+/** V2
  * Expected data in body: json object which contains
  * - "event" (as returned by an RPC node)
  * - "networkName" (SF canonical name)
@@ -72,7 +72,7 @@ async function processWebhookV2(data, res) {
         const networkName = data.networkName;
         const chainId = data.chainId;
         console.log(`Processing webhook v2 ${event.event} for ${networkName} (${chainId}), block ${event.blockNumber}`);
-        //console.log(`event: ${JSON.stringify(event, null, 2)}`);
+        //console.log(`full event data: ${JSON.stringify(event, null, 2)}`);
         data.receiveTimestamp = Date.now(); // add a timestamp to allow queue delaying
         queueV2.push(data);
         metrics.handleSuccessfulWebhook(event.event);
