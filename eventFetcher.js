@@ -124,7 +124,6 @@ class EventFetcher {
             tokenAddr: tokenAddr,
             sender: event.args[1],
             receiver: event.args[2],
-            date: new Date(sgData.timestamp * 1000).toUTCString(),
         };
     }
 

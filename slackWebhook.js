@@ -28,7 +28,8 @@ class SlackWebhook {
   // generic helpers
 
   getHeader(data) {
-    return `*${data.networkName}* - Block \`${data.blockNumber}\` - Event *${data.eventName}* at ${data.date}\n`;
+    return `*${data.networkName}* - Block \`${data.blockNumber}\` - Event *${data.eventName}` +
+      (data.data !== undefined ? `* at ${data.date}\n` : '\n');
   }
 
   getTxString(txHash, explorerUrlBase) {
