@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
 /*
-* usage: rpcFetcher.js <network name> <interface name> <contract name> <event name>
+* usage: rpcFetcher.js <network name> <interface name> <contract name or address> <event name>
 *   interface name is the name of the Solidity interface or contract
-*   contract name is the key for contract address lookup in metadata network.contractsV1
+*   contract name or address: either a contract name to lookup in metadata network.contractsV1,
+*                            or a direct contract address
 *
 * Intended usage:
 * Periodically invoke via cronjob.
@@ -27,14 +28,14 @@ const sfMetadata = require('@superfluid-finance/metadata');
 
 const networkName = process.argv[2];
 const ifaceName = process.argv[3];
-const contractName = process.argv[4];
+const contractNameOrAddress = process.argv[4];
 const eventName = process.argv[5];
 
 const WEBHOOK_BASE_URL = process.env.WEBHOOK_BASE_URL || 'http://localhost:3000';
 const BLOCK_HEAD_OFFSET = process.env.BLOCK_HEAD_OFFSET || 12;
 
-if (networkName === undefined || ifaceName === undefined || contractName === undefined || eventName === undefined) {
-    console.error(`usage: node ${process.argv[1]} <network name> <interface name> <contract name> <event name>`);
+if (networkName === undefined || ifaceName === undefined || contractNameOrAddress === undefined || eventName === undefined) {
+    console.error(`usage: node ${process.argv[1]} <network name> <interface name> <contract name or address> <event name>`);
     process.exit(1);
 }
 
@@ -48,14 +49,18 @@ if (abi === undefined) {
     throw("interface not in known Abis: ", ifaceName);
 }
 
-const contractAddr = process.env.CONTRACT_ADDRESS || network.contractsV1[contractName];
+const contractAddr = process.env.CONTRACT_ADDRESS || 
+    (ethers.utils.isAddress(contractNameOrAddress) ? 
+        contractNameOrAddress : 
+        network.contractsV1[contractNameOrAddress]);
+
 if (contractAddr === undefined) {
-    throw("contract not in network.contractsV1: ", contractName);
+    throw("contract not found: neither a valid address nor in network.contractsV1: " + contractNameOrAddress);
 }
 
 const rpcUrl = process.env.RPC || `https://${networkName}.rpc.x.superfluid.dev`;
 const maxQueryRange = network.logsQueryRange;
-const lastCheckedFilename = `blocknr_${networkName}-${ifaceName}-${contractName}-${eventName}.txt`;
+const lastCheckedFilename = `blocknr_${networkName}-${ifaceName}-${contractNameOrAddress}-${eventName}.txt`;
 let lastCheckedBlock = fs.existsSync(lastCheckedFilename) ? parseInt(fs.readFileSync(lastCheckedFilename, 'utf8')) : 0;
 
 console.log(`Using RPC ${rpcUrl}, ${ifaceName} contract at ${contractAddr}, event ${eventName}, max query range ${maxQueryRange}, last checked block ${lastCheckedBlock}`);

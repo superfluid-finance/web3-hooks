@@ -523,10 +523,10 @@
     ethereumjs-tx "2.1.2"
     ethereumjs-util "7.1.5"
 
-"@superfluid-finance/metadata@^1.1.13":
-  version "1.1.13"
-  resolved "https://registry.yarnpkg.com/@superfluid-finance/metadata/-/metadata-1.1.13.tgz#0068dc5f990998451f65c985862a8418c5c042db"
-  integrity sha512-AZ7kNAYyOVNZkaNvcn01iqA9GwT5vN6q3KA5GlP6eRfhnicxIVmbdK2316tUCvAQKRJ3NGOEjARfhUViEMmtOg==
+"@superfluid-finance/metadata@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@superfluid-finance/metadata/-/metadata-1.5.2.tgz#e17768e9145ad3cdfc633d6ee7396f0a63d7f934"
+  integrity sha512-0QrW4KeETnanTOQfAafUoVoCGRI4hy79V/Q48rIzwkWxk/ujfXStVdsy1eAXzBBUpUXkLzfOU3R6lqTugqECAg==
 
 "@szmarczak/http-timer@^4.0.5":
   version "4.0.6"
